@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nishtha - Gamified Habit Tracker</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="assets/icons/app-icon.png">
+  <link rel="manifest" href="manifest.json">
+  <!-- You can add a custom font here -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"></script>
+</head>
+<body>
+  <header class="app-header">
+    <h1>Nishtha</h1>
+    <p class="quote">"Small habits, big results!"</p>
+    <select id="theme-dropdown" class="btn" title="Select Theme" style="margin-left:0.5em;"></select>
+    <button id="reminder-settings-btn" class="btn" title="Reminder Settings" style="margin-left:0.5em;">⏰ Reminder Settings</button>
+    <button id="export-data-btn" class="btn" title="Export Data" style="margin-left:0.5em;">⬇️ Export Data</button>
+    <button id="import-data-btn" class="btn" title="Import Data" style="margin-left:0.5em;">⬆️ Import Data</button>
+    <button id="reset-data-btn" class="btn" title="Reset All Data" style="margin-left:0.5em;">🗑️ Reset All Data</button>
+    <button id="install-app-btn" class="btn" title="Install App" style="margin-left:0.5em;">⬇️ Install App</button>
+    <input type="file" id="import-data-file" accept="application/json" style="display:none;" />
+    <button id="logout-btn" class="btn" style="display:none;margin-left:0.5em;">🚪 Log out</button>
+  </header>
+
+  <div id="auth-modal" style="display:none;">
+    <div class="auth-backdrop"></div>
+    <div class="auth-modal-content">
+      <h2>Sign in to Nishtha</h2>
+      <form id="auth-form">
+        <input type="email" id="auth-email" placeholder="Email" required autocomplete="username">
+        <input type="password" id="auth-password" placeholder="Password" required autocomplete="current-password">
+        <button type="submit" class="btn primary" id="auth-signin-btn">Sign In</button>
+        <button type="button" class="btn" id="auth-signup-btn">Sign Up</button>
+      </form>
+      <div class="auth-divider">or</div>
+      <button class="btn" id="auth-google-btn">Sign in with Google</button>
+      <div id="auth-error" style="color:#c00;margin-top:0.7em;"></div>
+    </div>
+  </div>
+
+  <main>
+    <section class="add-habit-section">
+      <button id="show-add-habit" class="btn primary">+ Add Habit</button>
+      <form id="add-habit-form" class="hidden">
+        <input type="text" id="habit-name" placeholder="Habit name" required>
+        <input type="text" id="habit-category" placeholder="Category (e.g. Study, Fitness)" required>
+        <button type="submit" class="btn success">Add</button>
+        <button type="button" id="cancel-add-habit" class="btn">Cancel</button>
+      </form>
+    </section>
+
+    <section id="habits-list" class="habits-list">
+      <!-- Habit cards will be rendered here by script.js -->
+    </section>
+  </main>
+
+  <footer class="app-footer">
+    <p>Tip: Consistency is the key to success! | Made with ❤️ for students</p>
+  </footer>
+
+  <script src="script.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('service-worker.js');
+      });
+    }
+  </script>
+</body>
+</html>
