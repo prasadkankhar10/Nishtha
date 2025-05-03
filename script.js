@@ -1056,12 +1056,6 @@ window.addEventListener('DOMContentLoaded', async () => {
       showDevPanel();
     }
   });
-
-  // Ensure afterHabitChange is always defined
-  function afterHabitChange() {
-    renderTotalStreak();
-    checkThemeUnlocks();
-  }
 });
 
 
