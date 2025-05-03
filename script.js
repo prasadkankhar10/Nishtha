@@ -968,7 +968,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const { error } = await supabaseClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'http://prasadkankhar.me/Nishtha/'
+        redirectTo: 'https://prasadkankhar.me/Nishtha/'
       }
     });
     if (error) showAuthModal(true, error.message);
