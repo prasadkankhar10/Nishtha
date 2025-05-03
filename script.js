@@ -965,7 +965,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   };
   document.getElementById('auth-google-btn').onclick = async () => {
-    const { error } = await supabaseClient.auth.signInWithOAuth({ provider: 'google' });
+    const { error } = await supabaseClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: 'http://prasadkankhar.me/Nishtha/'
+      }
+    });
     if (error) showAuthModal(true, error.message);
   };
   document.getElementById('logout-btn').onclick = async () => {
