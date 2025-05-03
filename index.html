@@ -46,6 +46,7 @@
       <form id="add-habit-form" class="hidden">
         <input type="text" id="habit-name" placeholder="Habit name" required>
         <input type="text" id="habit-category" placeholder="Category (e.g. Study, Fitness)" required>
+        <input type="number" id="habit-target-per-week" placeholder="Times per week (1-7)" min="1" max="7" value="7" required>
         <button type="submit" class="btn success">Add</button>
         <button type="button" id="cancel-add-habit" class="btn">Cancel</button>
       </form>

@@ -245,6 +245,7 @@ async function markHabitDone(id) {
     }
     playSound("success");
     afterHabitChange();
+    await checkWeeklyHabitTargets();
   } else {
     console.log('Habit already marked as done for today.');
   }
@@ -303,6 +304,45 @@ async function checkMissedHabits() {
     renderHabits();
     showToast("Oops! Missed habits reset.");
     playSound("fail");
+  }
+}
+
+// Helper: Get ISO week string (e.g. '2025-W18')
+function getISOWeek(dateStr) {
+  const d = dateStr ? new Date(dateStr) : new Date();
+  d.setHours(0,0,0,0);
+  // Thursday in current week decides the year.
+  d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+  const week1 = new Date(d.getFullYear(),0,4);
+  return d.getFullYear() + '-W' + String(1 + Math.round(((d.getTime() - week1.getTime())/86400000 - 3 + ((week1.getDay()+6)%7))/7)).padStart(2,'0');
+}
+
+// Helper: Count completions in a week
+function countCompletionsThisWeek(habit) {
+  const week = getISOWeek();
+  return (habit.history || []).filter(dateStr => getISOWeek(dateStr) === week).length;
+}
+
+// Weekly streak check (run at startup and after marking done)
+async function checkWeeklyHabitTargets() {
+  const habits = await getHabitsUnified();
+  let changed = false;
+  const week = getISOWeek();
+  habits.forEach(habit => {
+    if (habit.lastCheckedWeek !== week) {
+      if (countCompletionsThisWeek(habit) === 0) {
+        habit.streakCount = 0;
+        habit.badge = null;
+        changed = true;
+      }
+      habit.lastCheckedWeek = week;
+    }
+  });
+  if (changed) {
+    await saveHabitsUnified(habits);
+    renderHabits();
+    showToast('Some streaks reset: weekly target not met.');
+    playSound('fail');
   }
 }
 
@@ -833,6 +873,7 @@ async function handleAuthState() {
 window.addEventListener('DOMContentLoaded', async () => {
   await renderHabits();
   checkMissedHabits();
+  await checkWeeklyHabitTargets();
   setTheme(getCurrentTheme(), false);
   renderTotalStreak();
   checkThemeUnlocks();
@@ -885,7 +926,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   };
 
   // Habit actions (mark as done, delete, view history, set rewards)
-  document.getElementById("habits-list").onclick = (e) => {
+  document.getElementById("habits-list").onclick = async (e) => {
     if (e.target.matches("button[data-id]")) {
       markHabitDone(e.target.getAttribute("data-id"));
     } else if (e.target.matches("button[data-delete]")) {
