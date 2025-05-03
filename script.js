@@ -964,6 +964,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       // TODO: Load habits from Supabase here
     }
   };
+
+  function isMobile() {
+    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
   document.getElementById('auth-google-btn').onclick = async () => {
     const redirectUrl = isMobile()
       ? 'https://prasadkankhar.me/Nishtha/'
@@ -1059,6 +1064,4 @@ window.addEventListener('DOMContentLoaded', async () => {
   }
 });
 
-function isMobile() {
-  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-}
+
