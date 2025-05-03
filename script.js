@@ -965,10 +965,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   };
   document.getElementById('auth-google-btn').onclick = async () => {
+    const redirectUrl = isMobile()
+      ? 'https://prasadkankhar.me/Nishtha/'
+      : 'http://prasadkankhar.me/Nishtha/';
+    console.log('Google sign-in redirectTo:', redirectUrl); // For debugging
     const { error } = await supabaseClient.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: 'https://prasadkankhar.me/Nishtha/'
+        redirectTo: redirectUrl
       }
     });
     if (error) showAuthModal(true, error.message);
@@ -1054,3 +1058,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     checkThemeUnlocks();
   }
 });
+
+function isMobile() {
+  return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+}
