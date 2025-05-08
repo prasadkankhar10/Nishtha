@@ -848,25 +848,22 @@ function resetAllData() {
 }
 
 // --- Auth Logic ---
-function showAuthModal(show = true, error = '') {
-  const modal = document.getElementById('auth-modal');
-  if (modal) modal.style.display = show ? 'flex' : 'none';
-  document.getElementById('auth-error').textContent = error || '';
-}
 function setLoggedInUI(isLoggedIn) {
   document.getElementById('logout-btn').style.display = isLoggedIn ? '' : 'none';
   document.querySelector('main').style.display = isLoggedIn ? '' : 'none';
   document.querySelector('.add-habit-section').style.display = isLoggedIn ? '' : 'none';
   document.getElementById('habits-list').style.display = isLoggedIn ? '' : 'none';
+  document.querySelector('header').style.display = isLoggedIn ? '' : 'none';
+  document.querySelector('footer').style.display = isLoggedIn ? '' : 'none';
+  var authPage = document.getElementById('auth-page');
+  if (authPage) authPage.style.display = isLoggedIn ? 'none' : 'flex';
 }
 async function handleAuthState() {
   const { data: { user } } = await supabaseClient.auth.getUser();
   if (user) {
-    showAuthModal(false);
     setLoggedInUI(true);
     // TODO: Load habits from Supabase here
   } else {
-    showAuthModal(true);
     setLoggedInUI(false);
   }
 }
@@ -986,9 +983,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     const password = document.getElementById('auth-password').value;
     const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
     if (error) {
-      showAuthModal(true, error.message);
+      setLoggedInUI(false);
     } else {
-      showAuthModal(false);
       setLoggedInUI(true);
       // TODO: Load habits from Supabase here
     }
@@ -998,9 +994,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     const password = document.getElementById('auth-password').value;
     const { error } = await supabaseClient.auth.signUp({ email, password });
     if (error) {
-      showAuthModal(true, error.message);
+      setLoggedInUI(false);
     } else {
-      showAuthModal(false);
       setLoggedInUI(true);
       // TODO: Load habits from Supabase here
     }
@@ -1021,11 +1016,10 @@ window.addEventListener('DOMContentLoaded', async () => {
         redirectTo: redirectUrl
       }
     });
-    if (error) showAuthModal(true, error.message);
+    if (error) setLoggedInUI(false);
   };
   document.getElementById('logout-btn').onclick = async () => {
     await supabaseClient.auth.signOut();
-    showAuthModal(true);
     setLoggedInUI(false);
     // Optionally clear localStorage or habits
   };

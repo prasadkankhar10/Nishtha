@@ -24,18 +24,20 @@
     <button id="logout-btn" class="btn" style="display:none;margin-left:0.5em;">🚪 Log out</button>
   </header>
 
-  <div id="auth-modal" style="display:none;">
-    <div class="auth-backdrop"></div>
-    <div class="auth-modal-content">
-      <h2>Sign in to Nishtha</h2>
+  <div id="auth-page" style="display: flex;">
+    <div class="auth-login-page">
+      <div class="auth-mascot"><img src="assets/icons/app-icon.png" alt="Mascot"></div>
+      <h2 class="auth-title">Sign in to Nishtha</h2>
+      <div class="auth-subtitle">Level Up Your Habits! <span>🏆</span></div>
+      <div class="auth-xp-bar"><div class="auth-xp-fill"></div></div>
       <form id="auth-form">
         <input type="email" id="auth-email" placeholder="Email" required autocomplete="username">
         <input type="password" id="auth-password" placeholder="Password" required autocomplete="current-password">
-        <button type="submit" class="btn primary" id="auth-signin-btn">Sign In</button>
-        <button type="button" class="btn" id="auth-signup-btn">Sign Up</button>
+        <button type="submit" class="btn primary" id="auth-signin-btn">🎮 Sign In</button>
+        <button type="button" class="btn" id="auth-signup-btn">🆕 Sign Up</button>
       </form>
       <div class="auth-divider">or</div>
-      <button class="btn" id="auth-google-btn">Sign in with Google</button>
+      <button class="btn" id="auth-google-btn">🔑 Sign in with Google</button>
       <div id="auth-error" style="color:#c00;margin-top:0.7em;"></div>
     </div>
   </div>
