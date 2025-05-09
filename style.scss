@@ -889,3 +889,51 @@ input[type="text"] {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+// Gamified spinner animation styles
+.spinner-gamified {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.25);
+  z-index: 9999;
+  position: fixed;
+  top: 0; left: 0;
+  .mascot-anim {
+    width: 80px;
+    height: 80px;
+    background: url('assets/icons/app-icon.png') center/contain no-repeat;
+    animation: mascot-bounce 1.2s infinite cubic-bezier(.68,-0.55,.27,1.55);
+    margin-bottom: 1.2em;
+  }
+  .xp-bar-anim {
+    width: 180px;
+    height: 18px;
+    background: #eee;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1em;
+    .xp-bar-fill-anim {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ffd700, #ff9800 80%, #ffeb3b);
+      border-radius: 12px;
+      transition: width 1.2s cubic-bezier(.68,-0.55,.27,1.55);
+    }
+  }
+  .spinner-msg {
+    color: #222;
+    font-size: 1.1em;
+    font-weight: 600;
+    margin-top: 0.5em;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 4px #fff8;
+  }
+}
+@keyframes mascot-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-18px) scale(1.08); }
+}

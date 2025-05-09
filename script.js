@@ -1111,9 +1111,36 @@ window.addEventListener('DOMContentLoaded', async () => {
   });
 });
 
-function showSpinner(show) {
+// Animate mascot and XP bar in spinner for gamified loading
+function animateSpinnerGamified(show) {
   var spinner = document.getElementById('loading-spinner');
-  if (spinner) spinner.style.display = show ? 'flex' : 'none';
+  if (!spinner) return;
+  if (show) {
+    spinner.innerHTML = `
+      <div class="spinner-gamified">
+        <div class="mascot-anim"></div>
+        <div class="xp-bar-anim">
+          <div class="xp-bar-fill-anim"></div>
+        </div>
+        <div class="spinner-msg">Leveling up your habits...</div>
+      </div>
+    `;
+    spinner.style.display = 'flex';
+    // Animate XP bar fill
+    var fill = spinner.querySelector('.xp-bar-fill-anim');
+    if (fill) {
+      fill.style.width = '0%';
+      setTimeout(() => { fill.style.width = '100%'; }, 100);
+    }
+  } else {
+    spinner.innerHTML = '';
+    spinner.style.display = 'none';
+  }
+}
+
+// Replace showSpinner to use gamified animation
+function showSpinner(show) {
+  animateSpinnerGamified(show);
 }
 
 // Returns true if running on localhost
