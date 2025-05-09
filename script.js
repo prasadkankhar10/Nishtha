@@ -38,32 +38,37 @@ function saveHabits(habits) {
 
 // --- Unified Habits Storage (Supabase + localStorage) ---
 async function getHabitsUnified() {
-  const { data: { user } } = await supabaseClient.auth.getUser();
-  if (user) {
-    // Try Supabase first
-    const { data, error } = await supabaseClient
-      .from('habits')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: true });
-    if (!error && data) {
-      const habits = data.map(h => ({
-        id: h.id,
-        name: h.name,
-        category: h.category,
-        streakCount: h.streak_count,
-        lastCompletedDate: h.last_completed_date,
-        badge: h.badge,
-        history: h.history || [],
-        rewards: h.rewards || {}
-      }));
-      // Sync to localStorage for offline use
-      localStorage.setItem('habits', JSON.stringify(habits));
-      return habits;
+  showSpinner(true);
+  try {
+    const { data: { user } } = await supabaseClient.auth.getUser();
+    if (user) {
+      // Try Supabase first
+      const { data, error } = await supabaseClient
+        .from('habits')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: true });
+      if (!error && data) {
+        const habits = data.map(h => ({
+          id: h.id,
+          name: h.name,
+          category: h.category,
+          streakCount: h.streak_count,
+          lastCompletedDate: h.last_completed_date,
+          badge: h.badge,
+          history: h.history || [],
+          rewards: h.rewards || {}
+        }));
+        // Sync to localStorage for offline use
+        localStorage.setItem('habits', JSON.stringify(habits));
+        return habits;
+      }
     }
+    // Fallback to localStorage
+    return JSON.parse(localStorage.getItem('habits') || '[]');
+  } finally {
+    showSpinner(false);
   }
-  // Fallback to localStorage
-  return JSON.parse(localStorage.getItem('habits') || '[]');
 }
 
 async function saveHabitsUnified(habits) {
@@ -868,7 +873,9 @@ async function handleAuthState() {
   }
 }
 window.addEventListener('DOMContentLoaded', async () => {
+  showSpinner(true);
   await renderHabits();
+  showSpinner(false);
   checkMissedHabits();
   await checkWeeklyHabitTargets();
   setTheme(getCurrentTheme(), false);
@@ -914,12 +921,24 @@ window.addEventListener('DOMContentLoaded', async () => {
     e.preventDefault();
     const name = document.getElementById("habit-name").value.trim();
     const category = document.getElementById("habit-category").value.trim();
-    if (name && category) {
-      await addHabit(name, category);
-      document.getElementById("add-habit-form").reset();
-      document.getElementById("add-habit-form").classList.add("hidden");
-      document.getElementById("show-add-habit").style.display = "";
+    // Data validation
+    if (name.length < 2 || name.length > 40) {
+      showToast("Habit name must be 2-40 characters.");
+      return;
     }
+    if (category.length < 2 || category.length > 30) {
+      showToast("Category must be 2-30 characters.");
+      return;
+    }
+    const habits = await getHabitsUnified();
+    if (habits.some(h => h.name.toLowerCase() === name.toLowerCase())) {
+      showToast("Duplicate habit name not allowed.");
+      return;
+    }
+    await addHabit(name, category);
+    document.getElementById("add-habit-form").reset();
+    document.getElementById("add-habit-form").classList.add("hidden");
+    document.getElementById("show-add-habit").style.display = "";
   };
 
   // Habit actions (mark as done, delete, view history, set rewards)
@@ -979,9 +998,11 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Auth form logic
   document.getElementById('auth-form').onsubmit = async (e) => {
     e.preventDefault();
+    showSpinner(true);
     const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value;
     const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    showSpinner(false);
     if (error) {
       setLoggedInUI(false);
     } else {
@@ -990,9 +1011,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   };
   document.getElementById('auth-signup-btn').onclick = async () => {
+    showSpinner(true);
     const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value;
     const { error } = await supabaseClient.auth.signUp({ email, password });
+    showSpinner(false);
     if (error) {
       setLoggedInUI(false);
     } else {
@@ -1000,22 +1023,17 @@ window.addEventListener('DOMContentLoaded', async () => {
       // TODO: Load habits from Supabase here
     }
   };
-
-  function isMobile() {
-    return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-  }
-
   document.getElementById('auth-google-btn').onclick = async () => {
-    const redirectUrl = isMobile()
-      ? 'https://prasadkankhar.me/Nishtha/'
-      : 'http://prasadkankhar.me/Nishtha/';
-    console.log('Google sign-in redirectTo:', redirectUrl); // For debugging
+    showSpinner(true);
+    // Use local redirect URL if running locally, otherwise use production
+    const redirectUrl = isLocalhost()
+      ? 'http://localhost:5500/'
+      : 'https://prasadkankhar.me/Nishtha/';
     const { error } = await supabaseClient.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: redirectUrl
-      }
+      options: { redirectTo: redirectUrl }
     });
+    showSpinner(false);
     if (error) setLoggedInUI(false);
   };
   document.getElementById('logout-btn').onclick = async () => {
@@ -1092,5 +1110,19 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   });
 });
+
+function showSpinner(show) {
+  var spinner = document.getElementById('loading-spinner');
+  if (spinner) spinner.style.display = show ? 'flex' : 'none';
+}
+
+// Returns true if running on localhost
+function isLocalhost() {
+  return (
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1' ||
+    window.location.hostname === '' // file:// protocol
+  );
+}
 
 
